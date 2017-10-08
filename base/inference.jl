@@ -4012,6 +4012,8 @@ function effect_free(@nospecialize(e), allow_volatile::Bool, src::CodeInfo, mod:
             # fall-through
         elseif head === :return
             # fall-through
+        elseif head === :isdefined
+            return allow_volatile
         elseif head === :the_exception
             return allow_volatile
         else
@@ -5395,6 +5397,9 @@ function void_use_elim_pass!(sv::InferenceState)
             h = ex.head
             if h === :return || h === :(=) || h === :gotoifnot || is_meta_expr_head(h)
                 return true
+            end
+            if h === :isdefined
+                return false
             end
             return !effect_free(ex, false, sv)
         elseif (isa(ex, GotoNode) || isa(ex, LineNumberNode) ||
